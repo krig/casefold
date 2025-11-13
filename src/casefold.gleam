@@ -1,23 +1,35 @@
 import gleam/list
 import gleam/string
 
-/// ASCII lowercase letters
+/// ASCII lowercase letters.
 pub const ascii_lowercase = "abcdefghijklmnopqrstuvwxyz"
-/// ASCII uppercase letters
+
+/// ASCII uppercase letters.
 pub const ascii_uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-/// ASCII letters (lower and uppercase)
+
+/// ASCII letters (lower and uppercase).
 pub const ascii_letters = ascii_lowercase <> ascii_uppercase
-/// The string "0123456789"
+
+/// The string "0123456789".
 pub const digits = "0123456789"
-/// The string "0123456789abcdefABCDEF"
+
+/// The string "0123456789abcdefABCDEF".
 pub const hex_digits = "0123456789abcdefABCDEF"
-/// The string "01234567"
+
+/// The string "01234567".
 pub const oct_digits = "01234567"
-/// ASCII characters which are considered punctuation characters
+
+/// ASCII characters which are considered punctuation characters.
 pub const ascii_punctuation = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~."
-/// ASCII characters which are considered whitespace
+
+/// ASCII characters which are considered whitespace.
 pub const ascii_whitespace = " \t\n\r\f\u{00000b}"
-pub const ascii_printable = digits <> ascii_letters <> ascii_punctuation <> ascii_whitespace
+
+/// All printable ASCII characters.
+pub const ascii_printable = digits
+  <> ascii_letters
+  <> ascii_punctuation
+  <> ascii_whitespace
 
 /// Converts a String to a case-agnostic comparable string.
 /// `casefold` is preferred over `string.lowercase` when two
@@ -26,7 +38,7 @@ pub const ascii_printable = digits <> ascii_letters <> ascii_punctuation <> asci
 @external(javascript, "./casefold_ffi.js", "casefold")
 pub fn casefold(s: String) -> String
 
-/// Expand leading tabs with the given tabstop
+/// Expand leading tabs with the given tabstop.
 pub fn expand_tabs(s: String, tabstop: Int) -> String {
   assert tabstop > 0
   let #(body, indent) = do_expand_tabs_indent(s, tabstop, 0)
@@ -42,7 +54,12 @@ fn do_expand_tabs_indent(s: String, tabstop: Int, col: Int) -> #(String, Int) {
     "   " <> rest -> do_expand_tabs_indent(rest, tabstop, col + 3)
     "  " <> rest -> do_expand_tabs_indent(rest, tabstop, col + 2)
     " " <> rest -> do_expand_tabs_indent(rest, tabstop, col + 1)
-    "\t" <> rest -> do_expand_tabs_indent(rest, tabstop, col + { tabstop - { col % tabstop } })
+    "\t" <> rest ->
+      do_expand_tabs_indent(
+        rest,
+        tabstop,
+        col + { tabstop - { col % tabstop } },
+      )
     _ -> #(s, col)
   }
 }
@@ -60,17 +77,13 @@ const alnum = ascii_letters <> digits
 /// True if all graphemes in string are ASCII
 /// alphanumeric characters.
 pub fn is_alnum(s: String) -> Bool {
-  list.all(string.to_graphemes(s), fn(ch) {
-    string.contains(alnum, ch)
-  })
+  list.all(string.to_graphemes(s), fn(ch) { string.contains(alnum, ch) })
 }
 
 /// True if all graphemes in string are ASCII
 /// letters.
 pub fn is_alpha(s: String) -> Bool {
-  list.all(string.to_graphemes(s), fn(ch) {
-    string.contains(ascii_letters, ch)
-  })
+  list.all(string.to_graphemes(s), fn(ch) { string.contains(ascii_letters, ch) })
 }
 
 /// True if all graphemes in string are ASCII
@@ -80,4 +93,25 @@ pub fn is_ascii(s: String) -> Bool {
     let i = string.utf_codepoint_to_int(cp)
     i >= 0 && i < 255
   })
+}
+
+/// True if the string contains only spaces and/or tabs
+/// or if the string is empty.
+pub fn is_hspaces(s: String) -> Bool {
+  case s {
+    " " <> s | "\t" <> s -> is_hspaces(s)
+    "" -> True
+    _ -> False
+  }
+}
+
+/// True if the string contains only ASCII whitespace
+/// or if the string is empty.
+pub fn is_blank(s: String) -> Bool {
+  case s {
+    " " <> s | "\t" <> s | "\n" <> s | "\r" <> s | "\f" <> s | "\u{00000b}" <> s ->
+      is_blank(s)
+    "" -> True
+    _ -> False
+  }
 }

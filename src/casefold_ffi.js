@@ -7,8 +7,8 @@ function matches(max_distance, s1, s2) {
   let counted = new Array(s2.length);
   for (let i = 0; i < s1.length; i++) {
     let lo = Math.max(i - max_distance, 0);
-    let hi = Math.min(i + max_distance, s2.length);
-    for (let j = lo; j <= hi; j++) {
+    let hi = Math.min(i + max_distance + 1, s2.length);
+    for (let j = lo; j < hi; j++) {
       if (s1[i] === s2[j] && counted[j] !== true) {
         counted[j] = true;
         matches += s1[i];
@@ -20,11 +20,11 @@ function matches(max_distance, s1, s2) {
 }
 
 function transpositions(m1, m2) {
-  let transpositions = 0;
+  let out_of_order = 0;
   for (let i = 0; i < Math.min(m1.length, m2.length); i++) {
-    transpositions += m1[i] !== m2[i] ? 1 : 0
+    out_of_order += m1[i] !== m2[i] ? 1 : 0
   }
-  return Math.floor(transpositions / 2);
+  return Math.floor(out_of_order / 2);
 }
 
 export function jaro_similarity(first, second) {

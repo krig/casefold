@@ -1,3 +1,4 @@
+import gleam/list
 import gleam/string
 
 /// ASCII lowercase letters
@@ -44,4 +45,39 @@ fn do_expand_tabs_indent(s: String, tabstop: Int, col: Int) -> #(String, Int) {
     "\t" <> rest -> do_expand_tabs_indent(rest, tabstop, col + { tabstop - { col % tabstop } })
     _ -> #(s, col)
   }
+}
+
+/// Returns a float between +0.0 and 1.0 representing the
+/// Jaro similarity between the given strings. Strings with
+/// a higher similarity will score closer to 1.0, with +0.0
+/// meaning no similarity and 1.0 meaning an exact match.
+@external(erlang, "string", "jaro_similarity")
+@external(javascript, "./casefold_ffi.js", "jaro_similarity")
+pub fn jaro_similarity(first: String, second: String) -> Float
+
+const alnum = ascii_letters <> digits
+
+/// True if all graphemes in string are ASCII
+/// alphanumeric characters.
+pub fn is_alnum(s: String) -> Bool {
+  list.all(string.to_graphemes(s), fn(ch) {
+    string.contains(alnum, ch)
+  })
+}
+
+/// True if all graphemes in string are ASCII
+/// letters.
+pub fn is_alpha(s: String) -> Bool {
+  list.all(string.to_graphemes(s), fn(ch) {
+    string.contains(ascii_letters, ch)
+  })
+}
+
+/// True if all graphemes in string are ASCII
+/// characters.
+pub fn is_ascii(s: String) -> Bool {
+  list.all(string.to_utf_codepoints(s), fn(cp) {
+    let i = string.utf_codepoint_to_int(cp)
+    i >= 0 && i < 255
+  })
 }

@@ -124,3 +124,9 @@ pub fn is_blank(s: String) -> Bool {
 @external(javascript, "./casefold_ffi.js", "split_lines")
 pub fn split_lines(s: String) -> List(String)
 
+/// Splits the input string into a list of
+/// words.
+/// An empty string splits into an empty list.
+@external(erlang, "casefold_ffi", "split_words")
+@external(javascript, "./casefold_ffi.js", "split_words")
+pub fn split_words(s: String) -> List(String)

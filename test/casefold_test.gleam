@@ -1,4 +1,4 @@
-import casefold.{casefold, expand_tabs, jaro_similarity, split_lines}
+import casefold.{casefold, expand_tabs, jaro_similarity, split_lines, split_words}
 import gleam/float
 import gleeunit
 
@@ -33,6 +33,10 @@ pub fn casefold_test() {
   assert equal_lists(split_lines(""), [])
   assert equal_lists(split_lines("\n"), ["", ""])
   assert equal_lists(split_lines("a\nb"), ["a", "b"])
+
+  assert equal_lists(split_words(""), [])
+  assert equal_lists(split_words("wibble wobble\nwibble wobble"), ["wibble", "wobble", "wibble", "wobble"])
+  assert equal_lists(split_words("wibble    wobble"), ["wibble", "wobble"])
 }
 
 fn equal_lists(a: List(String), b: List(String)) -> Bool {

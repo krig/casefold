@@ -44,3 +44,9 @@ export function split_lines(s) {
   let sp = s.split(/\r\n|\r|\n/g);
   return sp.reduceRight((acc, item) => List$NonEmpty(item, acc), List$Empty());
 }
+
+export function split_words(s) {
+  if (!s) return List$Empty();
+  let sp = s.split(/\s+/);
+  return sp.reduceRight((acc, item) => List$NonEmpty(item, acc), List$Empty());
+}

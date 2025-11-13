@@ -1,5 +1,5 @@
 name = "casefold"
-version = "1.4.0"
+version = "1.5.0"
 description = "Gleam library providing casefold and other string utility functions."
 licences = ["Apache-2.0"]
 repository = { type = "github", user = "krig", repo = "casefold" }

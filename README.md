@@ -3,9 +3,7 @@
 [![Package Version](https://img.shields.io/hexpm/v/casefold)](https://hex.pm/packages/casefold)
 [![Hex Docs](https://img.shields.io/badge/hex-docs-ffaff3)](https://hexdocs.pm/casefold/)
 
-Converts a String to a case-agnostic comparable string.
-`casefold` is preferred over `string.lowercase` when two
-strings are to be compared for equality.
+A small collection of utility functions and constants for working with strings.
 
 ```sh
 gleam add casefold@1

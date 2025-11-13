@@ -1,6 +1,6 @@
 name = "casefold"
-version = "1.0.0"
-description = "Converts a string to a case-agnostic comparable string."
+version = "1.1.0"
+description = "Gleam library providing casefold and other string utility functions."
 licences = ["Apache-2.0"]
 repository = { type = "github", user = "krig", repo = "casefold" }
 

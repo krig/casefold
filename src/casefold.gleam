@@ -115,3 +115,12 @@ pub fn is_blank(s: String) -> Bool {
     _ -> False
   }
 }
+
+/// Splits the input string into a list of
+/// lines with the line endings (\n or \r\n)
+/// removed.
+/// An empty string splits into an empty list.
+@external(erlang, "casefold_ffi", "split_lines")
+@external(javascript, "./casefold_ffi.js", "split_lines")
+pub fn split_lines(s: String) -> List(String)
+

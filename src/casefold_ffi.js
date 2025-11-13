@@ -1,3 +1,5 @@
+import { List$Empty, List$NonEmpty } from '../prelude.mjs';
+
 export function casefold(s) {
   return s.toLowerCase().toUpperCase().toLowerCase();
 }
@@ -35,4 +37,10 @@ export function jaro_similarity(first, second) {
   const m2 = matches(max_distance, second, first);
   let t = transpositions(m1, m2);
   return ((m/first.length) + (m/second.length) + (m - t)/m)/3;
+}
+
+export function split_lines(s) {
+  if (!s) return List$Empty();
+  let sp = s.split(/\r\n|\r|\n/g);
+  return sp.reduceRight((acc, item) => List$NonEmpty(item, acc), List$Empty());
 }

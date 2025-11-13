@@ -1,4 +1,4 @@
-import casefold.{casefold, expand_tabs, jaro_similarity}
+import casefold.{casefold, expand_tabs, jaro_similarity, split_lines}
 import gleam/float
 import gleeunit
 
@@ -28,4 +28,20 @@ pub fn casefold_test() {
   assert casefold.is_blank(" \t") == True
   assert casefold.is_hspaces(" \t") == True
   assert casefold.is_hspaces(" \t\n") == False
+
+
+  assert equal_lists(split_lines(""), [])
+  assert equal_lists(split_lines("\n"), ["", ""])
+  assert equal_lists(split_lines("a\nb"), ["a", "b"])
+}
+
+fn equal_lists(a: List(String), b: List(String)) -> Bool {
+  case a, b {
+    [av, ..arest], [bv, ..brest] -> case av == bv {
+      True -> equal_lists(arest, brest)
+      False -> False
+    }
+    [], [] -> True
+    _, _ -> False
+  }
 }

@@ -130,3 +130,128 @@ pub fn split_lines(s: String) -> List(String)
 @external(erlang, "casefold_ffi", "split_words")
 @external(javascript, "./casefold_ffi.js", "split_words")
 pub fn split_words(s: String) -> List(String)
+
+/// Format string
+///
+/// See also: `format_named`
+///
+/// Provides a basic string formatter.
+/// Does not handle type conversion, all
+/// values provided must be strings.
+///
+/// Values are inserted at {} slots in
+/// the format string. To include a literal
+/// { or }, use {{ or }}.
+///
+///
+/// Example:
+///
+/// ```gleam
+/// import gleam/io
+/// import casefold.{format}
+///
+/// pub fn main() {
+///   io.println(format("Hello, {}!", ["Joe"]))
+/// }
+/// ```
+pub fn format(fmt: String, slots: List(String)) -> String {
+  let ptn = format_compile()
+  format_acc(ptn, fmt, slots, "")
+}
+
+/// Format string (key/value)
+///
+/// Provides a basic string formatter.
+/// Does not handle type conversion, all
+/// values provided must be strings.
+///
+/// Values are inserted at {key} slots in
+/// the format string. To include a literal
+/// { or }, use {{ or }}.
+///
+///
+/// Example:
+///
+/// ```gleam
+/// import gleam/io
+/// import casefold.{format_named}
+///
+/// pub fn main() {
+///   io.println(format_named("Hello, {name}!", [#("name", "Joe")]))
+/// }
+/// ```
+pub fn format_named(fmt: String, slots: List(#(String, String))) -> String {
+  let ptn = format_compile()
+  format_named_acc(ptn, fmt, slots, "")
+}
+
+fn format_acc(ptn, fmt, slots, acc) {
+  let #(acc, s, r) = format_split(ptn, fmt, acc)
+  case s {
+    "" -> acc
+    "{" ->
+      case r {
+        "}" <> r ->
+          case slots {
+            [v, ..slots] -> format_acc(ptn, r, slots, acc <> v)
+            _ ->
+              panic as {
+                "format_acc:"
+                <> string.inspect(ptn)
+                <> " "
+                <> fmt
+                <> " "
+                <> string.inspect(slots)
+                <> " "
+                <> acc
+              }
+          }
+        "{" <> r -> format_acc(ptn, r, slots, acc <> "{")
+        _ -> panic as "unmatched {"
+      }
+    "}" ->
+      case r {
+        "}" <> r -> format_acc(ptn, r, slots, acc <> "}")
+        _ -> panic as "unmatched }"
+      }
+    _ -> panic as "Unreachable"
+  }
+}
+
+fn format_named_acc(ptn, fmt, slots, acc) {
+  let #(acc, s, r) = format_split(ptn, fmt, acc)
+  case s {
+    "" -> acc
+    "{" -> {
+      let #(key, s2, r) = format_split(ptn, r, "")
+      case s2 {
+        "}" ->
+          case list.key_find(slots, key) {
+            Ok(v) -> format_named_acc(ptn, r, slots, acc <> v)
+            Error(_) -> panic as { "No value provided for key=" <> key }
+          }
+        _ -> panic as "Unmatched {"
+      }
+    }
+    "}" ->
+      case r {
+        "}" <> r -> format_named_acc(ptn, r, slots, acc <> "}")
+        _ -> panic as "unmatched }"
+      }
+    _ -> panic as "Unreachable"
+  }
+}
+
+type Pattern
+
+@external(erlang, "casefold_ffi", "format_compile")
+@external(javascript, "./casefold_ffi.js", "formatCompile")
+fn format_compile() -> Pattern
+
+@external(erlang, "casefold_ffi", "format_split")
+@external(javascript, "./casefold_ffi.js", "formatSplit")
+fn format_split(
+  _ptn: Pattern,
+  _fmt: String,
+  _acc: String,
+) -> #(String, String, String)

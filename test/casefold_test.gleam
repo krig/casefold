@@ -1,4 +1,7 @@
-import casefold.{casefold, expand_tabs, jaro_similarity, split_lines, split_words}
+import casefold.{
+  casefold, expand_tabs, format, format_named, jaro_similarity, split_lines,
+  split_words,
+}
 import gleam/float
 import gleeunit
 
@@ -29,22 +32,36 @@ pub fn casefold_test() {
   assert casefold.is_hspaces(" \t") == True
   assert casefold.is_hspaces(" \t\n") == False
 
-
   assert equal_lists(split_lines(""), [])
   assert equal_lists(split_lines("\n"), ["", ""])
   assert equal_lists(split_lines("a\nb"), ["a", "b"])
 
   assert equal_lists(split_words(""), [])
-  assert equal_lists(split_words("wibble wobble\nwibble wobble"), ["wibble", "wobble", "wibble", "wobble"])
+  assert equal_lists(split_words("wibble wobble\nwibble wobble"), [
+    "wibble",
+    "wobble",
+    "wibble",
+    "wobble",
+  ])
   assert equal_lists(split_words("wibble    wobble"), ["wibble", "wobble"])
+
+  assert format("Hello, {}!", ["Joe"]) == "Hello, Joe!"
+  assert format("Hello, {{!", ["Joe"]) == "Hello, {!"
+  assert format("Hello, }}!", ["Joe"]) == "Hello, }!"
+  assert format("Hello, {} and {}!", ["Joe", "Mike"]) == "Hello, Joe and Mike!"
+  assert format_named("Hello, {a} and {b}!", [#("a", "Joe"), #("b", "Mike")])
+    == "Hello, Joe and Mike!"
+  assert format_named("Hello, {a} and {a}!", [#("a", "Joe"), #("b", "Mike")])
+    == "Hello, Joe and Joe!"
 }
 
 fn equal_lists(a: List(String), b: List(String)) -> Bool {
   case a, b {
-    [av, ..arest], [bv, ..brest] -> case av == bv {
-      True -> equal_lists(arest, brest)
-      False -> False
-    }
+    [av, ..arest], [bv, ..brest] ->
+      case av == bv {
+        True -> equal_lists(arest, brest)
+        False -> False
+      }
     [], [] -> True
     _, _ -> False
   }
